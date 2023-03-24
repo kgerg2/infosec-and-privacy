@@ -1,0 +1,34 @@
+Global:
+GPP[g] --- g
+GPP[g_a] - g^b
+GPP[H] --- hash
+GMK[a] --- b
+
+Authority (MSK, MPK):
+SK[alpha] ------ alpha_i
+SK[beta] ------- b_i
+SK[gamma] ------ ???
+PK[e_alpha] ---- e(g,g)^alpha_i
+PK[g_beta_inv] - g^(1/beta)
+
+User registration:
+u[z] ----- x_1
+u[u] ----- x_2
+u[g_z] --- g^(1/x_1)
+
+UKeyGen:
+USK[t] --- r_i
+USK[K] --- g^(alpha_i / x_1 + b * x_2 + b * r_i / b_i)
+USK[L] --- g^(b_i * r_i / x_1)
+USK[R] --- g^(b * r_i)
+USK[AK] -- ???
+USK[AK][attr] - g^(b_i * ??? * r_i / x_1) * auth[attr][PK]^(b_i * x_2)
+
+Encrypt:
+secret --- s
+k -------- m
+C1 ------- m * (e(g,g)^alpha_i)^s
+C2 ------- g^s
+C3 ------- g^(s / b_i)
+C
+
