@@ -34,7 +34,7 @@ class DACMACS(object):
         #:H = lambda str: g** group.hash(str)
         H = lambda x: self.group.hash(x, G1)
         a = self.group.random()
-        g_a = g ** a ## g^b
+        g_a = g ** a
         GPP = {'g': g, 'g_a': g_a, 'H': H}
         GMK = {'a': a}
         
@@ -47,9 +47,8 @@ class DACMACS(object):
         z = self.group.random()
         g_u = g ** u
         g_z = g ** (1 / z)
-        # moving z to the public part enables the attack
-        # return ((g_u, z), { 'g_z': g_z, 'u': u }) # (private, public)
-        return ((g_u, z), { 'g_z': g_z, 'u': u, 'z': z}) # (private, public)
+        
+        return ((g_u, z), { 'g_z': g_z, 'u': u }) # (private, public)
     
     def setupAuthority(self, GPP, authorityid, attributes, authorities):
         '''Generate attribute authority keys (executed by attribute authority)'''
@@ -115,7 +114,7 @@ class DACMACS(object):
         secret = self.group.random()
         shares = self.util.calculateSharesList(secret, policy)
         shares = dict([(x[0].getAttributeAndIndex(), x[1]) for x in shares])
-        print(f"real alpha_i * s = {(APK['e_alpha'] ** secret)}")
+        
         C1 = k * (APK['e_alpha'] ** secret)
         C2 = GPP['g'] ** secret
         C3 = APK['g_beta_inv'] ** secret
@@ -223,62 +222,6 @@ def basicTest():
     assert k == PT, 'FAILED DECRYPTION!'
     print('SUCCESSFUL DECRYPTION')
 
-def attack():
-    groupObj = PairingGroup('SS512')
-    dac = DACMACS(groupObj)
-    GPP, GMK = dac.setup()
-        
-    users = {} # public user data
-    authorities = {}
-    
-    authorityAttributes = ["ONE", "TWO", "THREE", "FOUR"]
-    authority1 = "authority1"
-    
-    dac.setupAuthority(GPP, authority1, authorityAttributes, authorities)
-    
-    alice = { 'id': 'alice', 'authoritySecretKeys': {}, 'keys': None }
-    alice['keys'], users[alice['id']] = dac.registerUser(GPP)
-
-
-    
-    for attr in authorityAttributes[0:1]:
-        USK = dac.keygen(GPP, authorities[authority1], attr, users[alice['id']], alice['authoritySecretKeys'])
-    
-    k = groupObj.random(GT)
-    
-    policy_str = 'ONE'
-    
-    CT = dac.encrypt(GPP, policy_str, k, authorities[authority1])
-    
-
-    x_1, x_2 = users[alice['id']]["z"], users[alice['id']]["u"]
-
-    k_1 = USK["K"]
-    k_3 = USK["R"]
-
-    C1 = CT["C1"]
-    C2 = CT["C2"]
-    C3 = CT["C3"]
-
-    # a_i_s = x_1 * k_1 * c_1 - x_1 * k_3 * c_2 - x_1 * x_2 * g * c_1
-    temp1 = pair(k_1, C2) ** x_1
-    temp2 = pair(GPP["g_a"], C2) ** (x_1 * x_2) * pair(k_3, C3) ** x_1
-    a_i_s = temp1 / temp2
-
-    decrypted = C1 / a_i_s
-
-    print(f"Calculated alpha_i_s: {a_i_s}")
-    
-    print(decrypted)
-
-    TK = dac.generateTK(GPP, CT, alice['authoritySecretKeys'], alice['keys'][0])
-    
-    PT = dac.decrypt(CT, TK, alice['keys'][1])
-    
-    print(PT)
-
-    print(decrypted == PT)
-
 def revokedTest():
     print("RUN revokedTest")
     groupObj = PairingGroup('SS512')
@@ -343,7 +286,6 @@ def test():
     # print "gt", gt
 
 if __name__ == '__main__':
-    attack()
-    # basicTest()
-    # revokedTest()
+    basicTest()
+    revokedTest()
     # test()
