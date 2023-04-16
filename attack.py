@@ -11,10 +11,9 @@ def attack():
     global_public_parameters, _ = dac.setup()
 
     users = {}
+    authorities = {}
 
     # Authority setup
-
-    authorities = {}
 
     authority1 = "authority1"
     possible_attributes = ["ONE", "TWO"]
@@ -38,24 +37,25 @@ def attack():
 
     message = groupObj.random(GT)  # message to encrypt
     print(f"Message: {message}")
-    policy_str = "ONE and TWO"  # doesn't matter for the attack, could be anything
-    # policy_str = "ONE"
-    # policy_str = "TWO"
+    # policy_str = "ONE"  # doesn't matter for the attack, could be anything
+    policy_str = "TWO"
+    # policy_str = "ONE or TWO"
+    # policy_str = "ONE and TWO"
     ciphertext = dac.encrypt(global_public_parameters, policy_str, message, authorities[authority1])
 
     # Perform the attack
 
-    x_2 = users[alice["id"]]["u"]  # This shouldn't be known to alice
+    x_2 = users[alice["id"]]["u"]  # This shouldn't be known to Alice
     a_i_s = calcualte_authority_secret(global_public_parameters,
                                        alice, alice_attr_keys,
                                        ciphertext,
                                        x_2)
     print(f"Calculated secret for authority1 (alpha_i_s): {a_i_s}")
 
-    # Decryption by the attacker
+    # Decryption with the attack
 
     decrypted = ciphertext["C1"] / a_i_s
-    print(f"Message decrypted by the attacker: {decrypted}")
+    print(f"Message decrypted by Alice using thee attack: {decrypted}")
     print(f"Attack is {'' if decrypted == message else 'not '}successful")
 
     # Decryption by the user
@@ -63,26 +63,26 @@ def attack():
     plaintext = None
 
     try:
-        # Decryption by alice - should fail
+        # Decryption by Alice - should fail
         token = dac.generateTK(global_public_parameters, ciphertext,
                                alice["authoritySecretKeys"], alice["keys"][0])
         assert token
         plaintext = dac.decrypt(ciphertext, token, alice["keys"][1])
 
-        print(f"Message decrypted by alice: {plaintext}")
+        print(f"Message decrypted by Alice: {plaintext}")
     except AssertionError:
-        print(f"Decryption by alice failed.")
+        print("Decryption by Alice failed.")
 
     try:
-        # Decryption by bob - should succeed
+        # Decryption by Bob - should succeed
         token = dac.generateTK(global_public_parameters, ciphertext,
                                bob["authoritySecretKeys"], bob["keys"][0])
         assert token
         plaintext = dac.decrypt(ciphertext, token, bob["keys"][1])
 
-        print(f"Message decrypted by bob: {plaintext}")
+        print(f"Message decrypted by Bob: {plaintext}")
     except AssertionError:
-        print(f"Decryption by bob failed.")
+        print("Decryption by Bob failed.")
 
 
 def calcualte_authority_secret(global_public_parameters, alice, alice_attr_keys, ciphertext, x_2):
