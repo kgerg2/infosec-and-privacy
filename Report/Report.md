@@ -244,15 +244,9 @@ The following pictures are screenshots showing the results of running the progra
 
 ![Screenshot of running the code with policy ONE.](scr_ONE.png)
 
----
-
 ![Screenshot of running the code with policy TWO.](scr_TWO.png)
 
----
-
 ![Screenshot of running the code with policy ONE or TWO.](scr_ONE_or_TWO.png)
-
----
 
 ![Screenshot of running the code with policy ONE and TWO.](scr_ONE_and_TWO.png)
 
