@@ -95,7 +95,9 @@ From these values, we can calculate the following:
 $$
 \frac{e(g^{\alpha_i/x_1 + x_2b + r_ib/b_i}, g^{s})^{x_1}}{e(g^b, g^s)^{x_1x_2} e(g^{r_ib}, g^{s/b_i})^{x_1}} = 
 \frac{e(g, g)^{(\alpha_i/x_1 + x_2b + r_ib/b_i) \cdot s \cdot x_1}}{e(g, g)^{bsx_1x_2} e(g, g)^{r_ibx_1s/b_i}} =
-\frac{e(g, g)^{\alpha_is + sx_1x_2b + sx_1r_ib/b_i}}{e(g, g)^{bsx_1x_2 + r_ibx_1s/b_i}} =
+$$
+$$
+= \frac{e(g, g)^{\alpha_is + sx_1x_2b + sx_1r_ib/b_i}}{e(g, g)^{bsx_1x_2 + r_ibx_1s/b_i}} =
 e(g,g)^{\alpha_is}
 $$
 
@@ -137,7 +139,8 @@ We setup one central authority (*authority1*) with two possible attributes (*ONE
     authority1 = "authority1"
     possible_attributes = ["ONE", "TWO"]
 
-    dac.setupAuthority(global_public_parameters, authority1, possible_attributes, authorities)
+    dac.setupAuthority(global_public_parameters, authority1,
+					   possible_attributes, authorities)
 ```
 
 #### 3. User registrations
@@ -149,18 +152,26 @@ We register two users:
 ```python
     alice = {"id": "alice", "authoritySecretKeys": {}, "keys": None}
 
-    alice["keys"], users[alice["id"]] = dac.registerUser(global_public_parameters)
+    alice["keys"], users[alice["id"]] = \
+		dac.registerUser(global_public_parameters)
 
-    alice_attr_keys = dac.keygen(global_public_parameters, authorities[authority1],
-                                 "ONE", users[alice["id"]], alice["authoritySecretKeys"])
+    alice_attr_keys = dac.keygen(global_public_parameters,
+								 authorities[authority1],
+                                 "ONE",
+								 users[alice["id"]],
+								 alice["authoritySecretKeys"])
 
 
     bob = {"id": "bob", "authoritySecretKeys": {}, "keys": None}
 
-    bob["keys"], users[bob["id"]] = dac.registerUser(global_public_parameters)
+    bob["keys"], users[bob["id"]] = \
+		dac.registerUser(global_public_parameters)
 
-    bob_attr_keys = dac.keygen(global_public_parameters, authorities[authority1],
-                               "TWO", users[bob["id"]], bob["authoritySecretKeys"])
+    bob_attr_keys = dac.keygen(global_public_parameters,
+							   authorities[authority1],
+                               "TWO",
+							   users[bob["id"]],
+							   bob["authoritySecretKeys"])
 ```
 
 #### 4. Message encryption
@@ -180,7 +191,8 @@ The possibilities are:
 
     policy_str = "ONE and TWO"
 
-    ciphertext = dac.encrypt(global_public_parameters, policy_str, message, authorities[authority1])
+    ciphertext = dac.encrypt(global_public_parameters, policy_str,
+							 message, authorities[authority1])
 ```
 
 #### 5. Performing the attack
@@ -198,7 +210,8 @@ It sould be noted that making `x_2` unknowable to Alice (possibly by encrypting 
     c3 = ciphertext["C3"]
 
     temp1 = pair(k_1, c2) ** x_1
-    temp2 = pair(global_public_parameters["g_a"], c2) ** (x_1 * x_2) * pair(k_3, c3) ** x_1
+    temp2 = pair(global_public_parameters["g_a"], c2) ** (x_1 * x_2) \
+			* pair(k_3, c3) ** x_1
 
     a_i_s = temp1 / temp2
 
@@ -213,8 +226,10 @@ Finally, we demonstrate how an honest decryption by Bob, who follows the rules o
 
 ```python
     try:
-        token = dac.generateTK(global_public_parameters, ciphertext,
-                               bob["authoritySecretKeys"], bob["keys"][0])
+        token = dac.generateTK(global_public_parameters,
+							   ciphertext,
+                               bob["authoritySecretKeys"],
+							   bob["keys"][0])
         assert token
         plaintext = dac.decrypt(ciphertext, token, bob["keys"][1])
         print(f"Message decrypted by Bob: {plaintext}")
