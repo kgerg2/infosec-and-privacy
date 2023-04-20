@@ -2,11 +2,62 @@
 
 ## Introduction
 
+Attribute-Based Encryption is a new technique in cryptography that has so far only been covered in graduate cryptography courses and academic papers.\
+It has barely filtered into new cryptography textbooks, let alone the broader programming community.\
+Attribute-Based Encryption (or ABE) allows for multiple private keys to be used with a single public key, which is very surprising to many people familiar with classical cryptography, where only a single key can decrypt any given message.\
+Public keys are constructed from a list of attributes instead of an identity. Anyone who has all the attributes can read the message.
+
+In ABE, decryption keys could depend on other small pieces of additional information embedded in the “identity” of the recipient by the sender.\
+For example, if Alice wants Bob to read a message starting tomorrow, she can embed tomorrow’s date as part of Bob’s “identity” (bob@symantec.com+jan-5–2019), and the email system would only give Bob the correct key on the specified date.\
+This would mean Bob would be unable to read the email before Jan 5. Similarly, embedding a clearance level (say TOPSECRET) would allow only a person who has the correct clearance to read the message.
+
+In this type of deployment, the following parties are involved:
++ **Key generation authorities (KGAs)**: They setup and deploy the system and register the users of the system.
++ **Data owners**: They encrypt sensitive data using user’s encryption keys according to a certain policy.
++ **Users**: They register in the system, and receive a set of attributes. They can decrypt data according to their attributes.
+
+![](blog_1.png)
+
+>*Image source: https://research.kudelskisecurity.com/2021/11/12/practical-attacks-against-attribute-based-encryption/*
+
 ## Definitions
 
 ### Security
 
+DAC-MACS is a popular multi-authority scheme that supports key revocation, meaning the access to the previously issued secrect key can be cancelled.\
+In multi-authority schemes like DAC-MACS, it is important to revoke keys when an authority is compromised or when a user's access rights have changed.\
+Revocation can be done by either updating the public parameters of the system or by issuing a new set of secret keys to authorized users.
+
+There have been examples of how an attack can be found effectively by attacking the YJR+13 scheme, also known as DAC-MACS.
+
+>  K. Yang, X. Jia, K. Ren, and B. Zhang, “DAC-MACS: Effective Data Access
+Control for Multiauthority Cloud Storage Systems”, in INFOCOM’13, pp. 2895–
+2903, IEEE, 2013.
+
+This proposed efficent attack was already broken in this study.
+
+> J. Hong, K. Xue, and W. Li, “Comments on “DAC-MACS: Effective Data Access
+Control for Multiauthority Cloud Storage Systems”/Security Analysis of Attribute
+Revocation in Multiauthority Data Access Control for Cloud Storage Systems”, in
+TIFS, 10(6), pp. 1315–1317, IEEE, 2015.
+
+However a fix for its revocation functionality was later proposed.
+>X. Wu, R. Jiang, and B. Bhargava, “On the Security of Data Access Control for
+Multiauthority Cloud Storage Systems”, in IEEE Transactions on Services Computing, 10(2), pp. 258–272, IEEE, 2017.
+
+We show that even the basic scheme—which matches the “fixed version”
+is still vulnerable to a complete decryption attack under certain circumstances.\
+We review a stripped-down version of the global and master-key setups, the user-key generation and encryption.\
+In particular, we consider only the parts that are not dependent on any attributes.\
+In the context of our study, we aim to demonstrate the existence of a vulnerability in the DAC-MACS scheme, which is characterized by having the option to describe multiple authorities.\
+Despite that, our attack methodology involves the creation of a single authority as this approach is suffices to successfully carry out and demonstrate the attack.
+
 ### Privacy
+
+The privacy issue in attribute-based encryption (ABE) is the potential violation of the confidentiality of the encrypted data and the privacy of the data owner.\
+If an attack is successfully executed on an ABE system, an unauthorized access is gained to the encrypted data without the knowledge or consent of the data owner.\
+This can result in the exposure of sensitive or private information, which can have severe consequences for the data owner, including reputational damage, financial loss, and identity theft.\
+As such, maintaining the privacy and confidentiality of data encrypted using ABE is critical to ensuring the security of both personal and professional information. 
 
 ## Analysis
 
